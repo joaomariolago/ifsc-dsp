@@ -1,7 +1,7 @@
 import numpy
 from typing import Tuple
 
-def signal_addition(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarray, n2: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def add(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarray, n2: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x1(n) + x2(n)
     Args:
@@ -24,7 +24,7 @@ def signal_addition(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarray, n2:
 
     return y, n
 
-def signal_multiplication(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarray, n2: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def multiply(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarray, n2: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x1(n) * x2(n)
     Args:
@@ -47,7 +47,7 @@ def signal_multiplication(x1: numpy.ndarray, n1: numpy.ndarray, x2: numpy.ndarra
 
     return y, n
 
-def signal_shift(x: numpy.ndarray, n: numpy.ndarray, k: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def shift(x: numpy.ndarray, n: numpy.ndarray, k: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x(n - k)
     Args:
@@ -65,7 +65,7 @@ def signal_shift(x: numpy.ndarray, n: numpy.ndarray, k: int) -> Tuple[numpy.ndar
 
     return y, n
 
-def signal_fold(x: numpy.ndarray, n: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def fold(x: numpy.ndarray, n: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x(-n)
     Args:
@@ -82,7 +82,7 @@ def signal_fold(x: numpy.ndarray, n: numpy.ndarray) -> Tuple[numpy.ndarray, nump
 
     return y, n
 
-def signal_convolution(x: numpy.ndarray, n: numpy.ndarray, h: numpy.ndarray, m: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def convolution(x: numpy.ndarray, n: numpy.ndarray, h: numpy.ndarray, m: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x(n) * h(n)
     Args:
@@ -101,7 +101,7 @@ def signal_convolution(x: numpy.ndarray, n: numpy.ndarray, h: numpy.ndarray, m: 
 
     return y, n
 
-def signal_correlation(x: numpy.ndarray, n: numpy.ndarray, h: numpy.ndarray, m: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def correlation(x: numpy.ndarray, n: numpy.ndarray, h: numpy.ndarray, m: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Implements y(n) = x(n) * h(-n)
     Args:

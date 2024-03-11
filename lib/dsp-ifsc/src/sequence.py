@@ -1,7 +1,7 @@
 import numpy
 from typing import Tuple
 
-def sequence_impulse(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def impulse(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = delta(n - n0); n_start <= n <= n_end
     Args:
@@ -19,7 +19,7 @@ def sequence_impulse(position: int, n_start: int, n_end: int) -> Tuple[numpy.nda
 
     return x, n
 
-def sequence_step(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def step(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = u(n - n0); n_start <= n <= n_end
     Args:
@@ -37,7 +37,7 @@ def sequence_step(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarra
 
     return x, n
 
-def sequence_ramp(slope: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def ramp(slope: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = (n - n0) * a; n_start <= n <= n_end
     Args:
@@ -56,7 +56,7 @@ def sequence_ramp(slope: float, position: int, n_start: int, n_end: int) -> Tupl
 
     return x, n
 
-def sequence_exponential(amplitude: float, decay: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def exponential(amplitude: float, decay: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = a * exp(-b * (n - n0)); n_start <= n <= n_end
     Args:
