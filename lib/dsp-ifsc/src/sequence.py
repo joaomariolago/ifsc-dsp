@@ -1,6 +1,7 @@
 import numpy
 from typing import Tuple
 
+
 def impulse(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = delta(n - n0); n_start <= n <= n_end
@@ -18,6 +19,7 @@ def impulse(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, num
     x = (n == position).astype(int)
 
     return x, n
+
 
 def step(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
@@ -37,6 +39,7 @@ def step(position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.
 
     return x, n
 
+
 def ramp(slope: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = (n - n0) * a; n_start <= n <= n_end
@@ -55,6 +58,7 @@ def ramp(slope: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.n
     x = (n - position) * slope
 
     return x, n
+
 
 def exponential(amplitude: float, decay: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
