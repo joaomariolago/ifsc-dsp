@@ -4,7 +4,7 @@ Issues = "https://github.com/JoaoMario109/ifsc-dsp-2024/issues"
 
 [tool.poetry]
 name = "dsp-ifsc"
-version = "0.0.2"
+version = "0.0.1"
 description = "A small package with some utilities for DSP grade at IFSC - Campus Florianópolis"
 authors = [
     "João Mário Lago <joao.mcil2003@aluno.ifsc.edu.br>",
@@ -18,7 +18,7 @@ classifiers = [
 readme = "README.md"
 repository = "https://github.com/JoaoMario109/ifsc-dsp-2024"
 license = "MIT"
-packages = [{include = "src"}]
+packages = [{include = "dsp_ifsc"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
