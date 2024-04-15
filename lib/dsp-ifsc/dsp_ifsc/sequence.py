@@ -60,7 +60,7 @@ def ramp(slope: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.n
     return x, n
 
 
-def exponential(amplitude: float, decay: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+def exponential(amplitude: float, alpha: float, position: int, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     Generates x(n) = a * exp(-b * (n - n0)); n_start <= n <= n_end
     Args:
@@ -76,6 +76,48 @@ def exponential(amplitude: float, decay: float, position: int, n_start: int, n_e
     """
 
     n = numpy.arange(n_start, n_end + 1)
-    x = amplitude * numpy.exp(-decay * (n - position))
+    x = amplitude * numpy.exp(alpha * (n - position))
+
+    return x, n
+
+
+def sine(amplitude: float, omega: float, phase: float, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    """
+    Generates x(n) = a * cos(w * n + p); n_start <= n <= n_end
+    Args:
+        amplitude: The amplitude of the sinusoidal.
+        omega: The frequency of the sinusoidal.
+        phase: The phase of the sinusoidal.
+        n_start: The start of the sequence.
+        n_end: The end of the sequence.
+
+    Returns:
+        x: The sinusoidal sequence.
+        n: The sequence of n values from n_start to n_end.
+    """
+
+    n = numpy.arange(n_start, n_end + 1)
+    x = amplitude * numpy.sin(omega * n + phase)
+
+    return x, n
+
+
+def cosine(amplitude: float, omega: float, phase: float, n_start: int, n_end: int) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    """
+    Generates x(n) = a * cos(w * n + p); n_start <= n <= n_end
+    Args:
+        amplitude: The amplitude of the cosine.
+        omega: The frequency of the cosine.
+        phase: The phase of the cosine.
+        n_start: The start of the sequence.
+        n_end: The end of the sequence.
+
+    Returns:
+        x: The cosine sequence.
+        n: The sequence of n values from n_start to n_end.
+    """
+
+    n = numpy.arange(n_start, n_end + 1)
+    x = amplitude * numpy.cos(omega * n + phase)
 
     return x, n

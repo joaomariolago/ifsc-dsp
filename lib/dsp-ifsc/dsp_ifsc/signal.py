@@ -1,8 +1,9 @@
-from typing import Self, Optional
+from typing import Self, Optional, Callable
 # External
 import numpy
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.ticker import MaxNLocator, AutoMinorLocator
 # Signals
 import dsp_ifsc.sequence as sequence
 
@@ -202,11 +203,11 @@ class Signal:
 
         plot.stem(self.n, self.x)
         # Adjust grid and axes scales and intervals
-        plot.grid(alpha = 0.3)
-        x_ticks = numpy.round(numpy.linspace(self.n.min(), self.n.max(), 10), 2)
-        y_ticks = numpy.round(numpy.linspace(self.x.min(), self.x.max() + self.x.max() / 10, 10), 2)
-        plot.set_xticks(x_ticks)
-        plot.set_yticks(y_ticks)
+        plot.xaxis.set_major_locator(MaxNLocator(nbins = 'auto'))  # Automatically adjust x-ticks
+        plot.yaxis.set_major_locator(MaxNLocator(nbins = 'auto'))  # Automatically adjust y-ticks
+        plot.xaxis.set_minor_locator(AutoMinorLocator())
+        plot.yaxis.set_minor_locator(AutoMinorLocator())
+        plot.grid(True, which = 'both', linestyle = '--', linewidth = 0.5, alpha = 0.7)
         # Details
         plot.set_xlabel('n')
         plot.set_ylabel('x(n)')
@@ -449,6 +450,21 @@ class Signal:
 
     # Static methods
 
+    @staticmethod
+    def from_zeros(n: numpy.ndarray) -> 'Signal':
+        """
+        Generates a zero signal.
+        Args:
+            n: The sequence of n values.
+
+        Returns:
+            signal: The zero Signal class.
+        """
+
+        x = numpy.zeros(len(n))
+
+        return Signal(x, n)
+
 
     @staticmethod
     def from_scalar(scalar: float, n: numpy.ndarray) -> 'Signal':
@@ -468,12 +484,12 @@ class Signal:
 
 
     @staticmethod
-    def from_impulse(position: int, n: numpy.ndarray) -> 'Signal':
+    def from_impulse(n: numpy.ndarray, position: int = 0) -> 'Signal':
         """
         Generates an impulse signal.
         Args:
-            position: The position of the impulse.
             n: The sequence of n values.
+            position: The position of the impulse.
 
         Returns:
             signal: The impulse Signal class.
@@ -485,7 +501,7 @@ class Signal:
 
 
     @staticmethod
-    def from_step(position: int, n: numpy.ndarray):
+    def from_step(n: numpy.ndarray, position: int = 0) -> 'Signal':
         """
         Generates a step signal.
         Returns:
@@ -498,7 +514,7 @@ class Signal:
 
 
     @staticmethod
-    def from_ramp(slope: float, position: int, n: numpy.ndarray):
+    def from_ramp(slope: float, n: numpy.ndarray, position: int = 0) -> 'Signal':
         """
         Generates a ramp signal.
         Returns:
@@ -511,13 +527,39 @@ class Signal:
 
 
     @staticmethod
-    def from_exponential(amplitude: float, decay: float, position: int, n: numpy.ndarray):
+    def from_exponential(alpha: float, n: numpy.ndarray, position: int = 0, amplitude: float = 1.0) -> 'Signal':
         """
         Generates an exponential signal.
         Returns:
             signal: The exponential Signal class.
         """
 
-        x, _n = sequence.exponential(amplitude, decay, position, n.min(), n.max())
+        x, _n = sequence.exponential(amplitude, alpha, position, n.min(), n.max())
+
+        return Signal(x, _n)
+
+
+    @staticmethod
+    def from_sine(omega: float, n: numpy.ndarray, phase: float = 0.0, amplitude: float = 1.0) -> 'Signal':
+        """
+        Generates a sine signal.
+        Returns:
+            signal: The sine Signal class.
+        """
+
+        x, _n = sequence.sine(amplitude, omega, phase, n.min(), n.max())
+
+        return Signal(x, _n)
+
+
+    @staticmethod
+    def from_cosine(omega: float, n: numpy.ndarray, phase: float = 0.0, amplitude: float = 1.0) -> 'Signal':
+        """
+        Generates a cosine signal.
+        Returns:
+            signal: The cosine Signal class.
+        """
+
+        x, _n = sequence.cosine(amplitude, omega, phase, n.min(), n.max())
 
         return Signal(x, _n)
