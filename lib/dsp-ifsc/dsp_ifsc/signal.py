@@ -1,4 +1,4 @@
-from typing import Self, Optional, Callable
+from typing import Self, Optional
 # External
 import numpy
 import matplotlib.pyplot as plt
@@ -31,8 +31,9 @@ class Signal:
         if len(n) > len(x):
             x = numpy.pad(x, (0, len(n) - len(x)))
 
-        self.x = x
-        self.n = n
+        self.x = numpy.array(x)
+        self.n = numpy.array(n)
+
 
     # Methods
 
@@ -48,11 +49,36 @@ class Signal:
 
         n = numpy.arange(min(self.n.min(0), other.n.min(0)), max(self.n.max(0), other.n.max(0)) + 1)
         y1 = numpy.zeros(len(n))
-        y1[numpy.logical_and((n >= self.n.min(0)), (n <= self.n.max(0)))] = self.x
+        y1[numpy.logical_and((n >= self.n.min(0)), (n <= self.n.max(0)))] = self.x.copy()
         y2 = numpy.zeros(len(n))
-        y2[numpy.logical_and((n >= other.n.min(0)), (n <= other.n.max(0)))] = other.x
+        y2[numpy.logical_and((n >= other.n.min(0)), (n <= other.n.max(0)))] = other.x.copy()
 
         return n, y1, y2
+
+
+    def tile(self, k: int) -> 'Signal':
+        """
+        Tiles the signal.
+        Args:
+            n: The sequence of n values.
+            k: The number of tiles.
+
+        Returns:
+            signal: The tiled Signal class.
+        """
+
+        # Check if n is equally spaced
+        if len(self.n) < 2:
+            raise ValueError('n must have at least two elements')
+
+        diff = self.n[1] - self.n[0]
+        if not numpy.all(numpy.diff(self.n) == diff):
+            raise ValueError('n must be equally spaced')
+
+        y = numpy.tile(self.x, k)
+        _n = [ self.n[0] + i * diff for i in range(len(y)) ]
+
+        return Signal(y, _n)
 
 
     def add(self, other: Self) -> 'Signal':
@@ -119,7 +145,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def shift(self, k: int) -> 'Signal':
+    def shift(self, k: int | float) -> 'Signal':
         """
         Implements y(n) = x(n - k)
         Args:
@@ -129,7 +155,7 @@ class Signal:
             signal: The shifted Signal class.
         """
 
-        y = self.x
+        y = self.x.copy()
         n = self.n + k
 
         return Signal(y, n)
@@ -156,9 +182,25 @@ class Signal:
         """
 
         y = -self.x
-        n = self.n
+        n = self.n.copy()
 
         return Signal(y, n)
+
+
+    def scale(self, k: int) -> 'Signal':
+        """
+        Implements y(n) = x(k * n)
+        Args:
+            k: The scale factor.
+
+        Returns:
+            signal: The scaled Signal class.
+        """
+
+        # Subsample the signal values with a step of k
+        y = self.x[::k]
+
+        return Signal(y, self.n)
 
 
     def convolution(self, other: Self) -> 'Signal':
@@ -172,7 +214,7 @@ class Signal:
         """
 
         y = numpy.convolve(self.x, other.x)
-        n = numpy.arange(self.n.min(0) + other.n.min(0), self.n.max(0) + other.n.max(0) + 1)
+        n = numpy.arange(self.n.min() + other.n.min(), self.n.max() + other.n.max() + 1)
 
         return Signal(y, n)
 
@@ -188,12 +230,12 @@ class Signal:
         """
 
         y = numpy.correlate(self.x, other.x)
-        n = numpy.arange(self.n.min(0) - other.n.max(0), self.n.max(0) - other.n.min(0) + 1)
+        n = numpy.arange(self.n.min() + other.n.min(), self.n.max() + other.n.max() + 1)
 
         return Signal(y, n)
 
 
-    def stem(self, plot: Optional[Axes] = None, auto_plot: Optional[bool] = True) -> Axes:
+    def stem(self, title: Optional[str] = r'Signal', plot: Optional[Axes] = None, auto_plot: Optional[bool] = True) -> Axes:
         """
         Plots the signal.
         """
@@ -211,7 +253,7 @@ class Signal:
         # Details
         plot.set_xlabel('n')
         plot.set_ylabel('x(n)')
-        plot.set_title('Signal')
+        plot.set_title(title)
 
         if auto_plot:
             plt.show()
@@ -314,7 +356,7 @@ class Signal:
         return self.negate()
 
 
-    def __lshift__(self, k: int) -> 'Signal':
+    def __lshift__(self, k: int | float) -> 'Signal':
         """
         Overloads the << operator.
         Args:
@@ -324,10 +366,10 @@ class Signal:
             signal: The shifted Signal class.
         """
 
-        return self.shift(k)
+        return self.shift(-k)
 
 
-    def __rshift__(self, k: int) -> 'Signal':
+    def __rshift__(self, k: int | float) -> 'Signal':
         """
         Overloads the >> operator.
         Args:
@@ -337,7 +379,7 @@ class Signal:
             signal: The shifted Signal class.
         """
 
-        return self.shift(-k)
+        return self.shift(k)
 
 
     def __invert__(self) -> 'Signal':
@@ -446,6 +488,20 @@ class Signal:
         """
 
         return other.correlation(self)
+
+
+    def __getitem__(self, key):
+        """
+        Overloads the [] operator.
+
+        Returns:
+            signal: The Signal class.
+        """
+
+        if isinstance(key, slice):
+            return Signal(self.x[key], self.n[key])
+
+        return self.x[key]
 
 
     # Static methods
@@ -563,3 +619,18 @@ class Signal:
         x, _n = sequence.cosine(amplitude, omega, phase, n.min(), n.max())
 
         return Signal(x, _n)
+
+
+    @staticmethod
+    def from_tile(x: numpy.ndarray, n: numpy.ndarray, k: int) -> 'Signal':
+        """
+        Tiles the signal.
+        Args:
+            n: The sequence of n values.
+            k: The number of tiles.
+
+        Returns:
+            signal: The tiled Signal class.
+        """
+
+        return Signal(x, n).tile(k)
