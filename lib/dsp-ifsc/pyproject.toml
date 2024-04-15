@@ -4,7 +4,7 @@ Issues = "https://github.com/JoaoMario109/ifsc-dsp-2024/issues"
 
 [tool.poetry]
 name = "dsp-ifsc"
-version = "0.0.9"
+version = "0.0.10"
 description = "A small package with some utilities for DSP grade at IFSC - Campus Florianópolis"
 authors = [
     "João Mário Lago <joao.mcil2003@aluno.ifsc.edu.br>",
@@ -21,7 +21,7 @@ license = "MIT"
 packages = [{include = "dsp_ifsc"}]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.11"
 numpy = "*"
 matplotlib = "*"
 
