@@ -57,12 +57,14 @@ class System:
         n = numpy.arange(-100, 100)
         x = Signal(self.rng.random(len(n)), n)
 
-        total_diff = 0.0
+        total_diff_x = 0.0
+        total_diff_n = 0.0
         for i in range(-20, 20):
             rnd_shift = self.rng.random() * i
             y1 = self.sys(x) << rnd_shift
             y2 = self.sys(x << rnd_shift)
 
-            total_diff += numpy.sum(numpy.abs(y1.x - y2.x))
+            total_diff_x += numpy.sum(numpy.abs(y1.x - y2.x))
+            total_diff_n = numpy.sum(numpy.abs(y1.n - y2.n))
 
-        return total_diff < 1e-5
+        return (total_diff_x + total_diff_n) < 1e-5

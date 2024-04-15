@@ -51,7 +51,7 @@ class Signal:
         y1 = numpy.zeros(len(n))
         y1[numpy.logical_and((n >= self.n.min(0)), (n <= self.n.max(0)))] = self.x.copy()
         y2 = numpy.zeros(len(n))
-        y2[numpy.logical_and((n >= other.n.min(0)), (n <= other.n.max(0)))] = other.x.copy()
+        y2[numpy.logical_and((n >= other.n.min(0)), (n < other.n.max(0) + (other.n[1] - other.n[0])))] = other.x.copy()
 
         return n, y1, y2
 
@@ -200,7 +200,9 @@ class Signal:
         # Subsample the signal values with a step of k
         y = self.x[::k]
 
-        return Signal(y, self.n)
+        n = (self.n / k)[::k]
+
+        return Signal(y, n)
 
 
     def convolution(self, other: Self) -> 'Signal':
