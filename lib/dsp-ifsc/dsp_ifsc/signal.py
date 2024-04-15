@@ -1,8 +1,9 @@
-from typing import Self, Optional
+from typing import Self, Optional, Tuple, List
 # External
 import numpy
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator, AutoMinorLocator
 # Signals
 import dsp_ifsc.sequence as sequence
@@ -261,6 +262,46 @@ class Signal:
             plt.show()
 
         return plot
+
+
+    def freqz(self, w: numpy.ndarray) -> 'Signal':
+        """
+        Computes the frequency response of the signal.
+        Args:
+            w: The frequency range.
+
+        Returns:
+            Signal: The frequency response (x-axis: H(e^{jw}, n-axis: w)
+        """
+
+        H = numpy.sum(self.x * numpy.exp(-1j * numpy.outer(w, self.n)), axis = 1)
+
+        return Signal(H, w)
+
+
+    def plot_as_frequency_response(
+        self,
+        title_mag: Optional[str] = r'Magnitude Frequency Response',
+        title_phase: Optional[str] = r'Phase Frequency Response',
+        auto_plot: Optional[bool] = True
+    ) -> Tuple[Figure, List[Axes]]:
+        fig, axs = plt.subplots(2, 1)
+        fig.tight_layout(h_pad = 5.0)
+
+        axs[0].plot(self.n, numpy.abs(self.x))
+        axs[0].set_xlabel(r'$\omega$')
+        axs[0].set_ylabel(r'$|H(e^{j\omega})|$')
+        axs[0].set_title(title_mag)
+
+        axs[1].plot(self.n, numpy.angle(self.x))
+        axs[1].set_xlabel(r'$\omega$')
+        axs[1].set_ylabel(r'$\angle H(e^{j\omega})$')
+        axs[1].set_title(title_phase)
+
+        if auto_plot:
+            plt.show()
+
+        return fig, axs
 
 
     # Overloads
