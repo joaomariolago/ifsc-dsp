@@ -1,4 +1,4 @@
-from typing import Self, Optional, Tuple, List
+from typing import Any, Optional, Tuple, List
 # External
 import numpy
 import matplotlib.pyplot as plt
@@ -38,7 +38,7 @@ class Signal:
 
     # Methods
 
-    def _adjust_signals(self, other: Self) -> numpy.ndarray:
+    def _adjust_signals(self, other: Any) -> numpy.ndarray:
         """
         Adjusts the n sequence of two signals.
         Args:
@@ -82,7 +82,7 @@ class Signal:
         return Signal(y, _n)
 
 
-    def add(self, other: Self) -> 'Signal':
+    def add(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x1(n) + x2(n)
         Args:
@@ -98,7 +98,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def subtract(self, other: Self) -> 'Signal':
+    def subtract(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x1(n) - x2(n)
         Args:
@@ -114,7 +114,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def multiply(self, other: Self) -> 'Signal':
+    def multiply(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x1(n) * x2(n)
         Args:
@@ -130,7 +130,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def divide(self, other: Self) -> 'Signal':
+    def divide(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x1(n) / x2(n)
         Args:
@@ -206,7 +206,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def convolution(self, other: Self) -> 'Signal':
+    def convolution(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x(n) * h(n)
         Args:
@@ -222,7 +222,7 @@ class Signal:
         return Signal(y, n)
 
 
-    def correlation(self, other: Self) -> 'Signal':
+    def correlation(self, other: Any) -> 'Signal':
         """
         Implements y(n) = x(n) * h(-n)
         Args:
@@ -306,7 +306,7 @@ class Signal:
 
     # Overloads
 
-    def __add__(self, other: Self | int | float) -> 'Signal':
+    def __add__(self, other: Any | int | float) -> 'Signal':
         """
         Overloads the + operator.
         Args:
@@ -325,7 +325,7 @@ class Signal:
     __radd__ = __add__
 
 
-    def __sub__(self, other: Self | int | float) -> 'Signal':
+    def __sub__(self, other: Any | int | float) -> 'Signal':
         """
         Overloads the - operator.
         Args:
@@ -341,7 +341,7 @@ class Signal:
         return self.subtract(other)
 
 
-    def __rsub__(self, other: Self | int | float) -> 'Signal':
+    def __rsub__(self, other: Any | int | float) -> 'Signal':
         """
         Overloads the - operator.
         Args:
@@ -354,7 +354,7 @@ class Signal:
         return self.negate() + other
 
 
-    def __mul__(self, other: Self | int | float) -> 'Signal':
+    def __mul__(self, other: Any | int | float) -> 'Signal':
         """
         Overloads the * operator.
         Args:
@@ -373,7 +373,7 @@ class Signal:
     __rmul__ = __mul__
 
 
-    def __truediv__(self, other: Self | int | float) -> 'Signal':
+    def __truediv__(self, other: Any | int | float) -> 'Signal':
         """
         Overloads the / operator.
         Args:
@@ -455,7 +455,7 @@ class Signal:
         return str(self)
 
 
-    def __matmul__(self, other: Self) -> 'Signal':
+    def __matmul__(self, other: Any) -> 'Signal':
         """
         Overloads the @ operator.
         Args:
@@ -468,7 +468,7 @@ class Signal:
         return self.convolution(other)
 
 
-    def __rmatmul__(self, other: Self) -> 'Signal':
+    def __rmatmul__(self, other: Any) -> 'Signal':
         """
         Overloads the @ operator.
         Args:
@@ -481,7 +481,7 @@ class Signal:
         return other.convolution(self)
 
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """
         Overloads the == operator.
         Args:
@@ -494,7 +494,7 @@ class Signal:
         return numpy.array_equal(self.x, other.x) and numpy.array_equal(self.n, other.n)
 
 
-    def __ne__(self, other: Self) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """
         Overloads the != operator.
         Args:
@@ -507,7 +507,7 @@ class Signal:
         return not (self == other)
 
 
-    def __mod__(self, other: Self) -> 'Signal':
+    def __mod__(self, other: Any) -> 'Signal':
         """
         Overloads the % operator.
         Args:
@@ -520,7 +520,7 @@ class Signal:
         return self.correlation(other)
 
 
-    def __rmod__(self, other: Self) -> 'Signal':
+    def __rmod__(self, other: Any) -> 'Signal':
         """
         Overloads the % operator.
         Args:

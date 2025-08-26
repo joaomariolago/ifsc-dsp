@@ -1,4 +1,4 @@
-from typing import Self, Optional, Callable
+from typing import Callable
 # External
 import numpy
 # Signals
