@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator, AutoMinorLocator
+from scipy.interpolate import CubicSpline
 # Signals
 import dsp_ifsc.sequence as sequence
 
@@ -34,6 +35,44 @@ class Signal:
 
         self.x = numpy.array(x)
         self.n = numpy.array(n)
+
+
+    # Properties
+
+    @property
+    def real(self) -> numpy.ndarray:
+        """
+        Returns the real part of the signal.
+        """
+
+        return self.x.real
+
+
+    @property
+    def imag(self) -> numpy.ndarray:
+        """
+        Returns the imaginary part of the signal.
+        """
+
+        return self.x.imag
+
+
+    @property
+    def abs(self) -> numpy.ndarray:
+        """
+        Returns the absolute value of the signal.
+        """
+
+        return numpy.abs(self.x)
+
+
+    @property
+    def angle(self) -> numpy.ndarray:
+        """
+        Returns the angle of the signal.
+        """
+
+        return numpy.angle(self.x)
 
 
     # Methods
@@ -279,30 +318,167 @@ class Signal:
         return Signal(H, w)
 
 
-    def plot_as_frequency_response(
+    def spectrum(
         self,
-        title_mag: Optional[str] = r'Magnitude Frequency Response',
-        title_phase: Optional[str] = r'Phase Frequency Response',
+        fs: float,
+        normalize: bool = True,
+        shift: bool = True,
+    ) -> "Signal":
+        """
+        Computes the FFT spectrum of a sampled signal.
+
+        Args:
+            fs: Sampling frequency in Hz.
+            normalize: If True, divides FFT by N.
+            shift: If True, centers spectrum around 0 Hz.
+
+        Returns:
+            Signal: Spectrum with x-axis in Hz.
+        """
+
+        N = len(self.x)
+
+        X = numpy.fft.fft(self.x)
+
+        if normalize:
+            X = X / N
+
+        freqs = numpy.fft.fftfreq(N, d=1 / fs)
+
+        if shift:
+            X = numpy.fft.fftshift(X)
+            freqs = numpy.fft.fftshift(freqs)
+
+        return Signal(X, freqs)
+
+
+    def spectrum_periodic(self, fs: float, periods: int = 3, normalize: bool = True) -> "Signal":
+        N = len(self.x)
+
+        X = numpy.fft.fftshift(numpy.fft.fft(self.x))
+
+        if normalize:
+            X = X / N
+
+        freqs = numpy.fft.fftshift(numpy.fft.fftfreq(N, d=1 / fs))
+
+        all_freqs = []
+        all_X = []
+
+        for k in range(-periods, periods + 1):
+            all_freqs.append(freqs + k * fs)
+            all_X.append(X)
+
+        all_freqs = numpy.concatenate(all_freqs)
+        all_X = numpy.concatenate(all_X)
+
+        order = numpy.argsort(all_freqs)
+
+        return Signal(all_X[order], all_freqs[order])
+
+
+    def plot_frequency_domain(
+        self,
+        title_mag: Optional[str] = 'Magnitude Spectrum',
+        title_phase: Optional[str] = 'Phase Spectrum',
+        xlabel: Optional[str] = 'Frequency [Hz]',
+        magnitude_label: Optional[str] = r'$|X(f)|$',
+        phase_label: Optional[str] = r'$\angle X(f)$',
+        unwrap_phase: bool = False,
         auto_plot: Optional[bool] = True
     ) -> Tuple[Figure, List[Axes]]:
+
         fig, axs = plt.subplots(2, 1)
-        fig.tight_layout(h_pad = 5.0)
+        fig.tight_layout(h_pad=5.0)
 
-        axs[0].plot(self.n, numpy.abs(self.x))
-        axs[0].set_xlabel(r'$\omega$')
-        axs[0].set_ylabel(r'$|H(e^{j\omega})|$')
+        mag = numpy.abs(self.x)
+
+        axs[0].plot(self.n, mag)
+        axs[0].set_xlabel(xlabel)
+        axs[0].set_ylabel(magnitude_label)
         axs[0].set_title(title_mag)
+        axs[0].grid(True)
 
-        axs[1].plot(self.n, numpy.angle(self.x))
-        axs[1].set_xlabel(r'$\omega$')
-        axs[1].set_ylabel(r'$\angle H(e^{j\omega})$')
+        phase = numpy.angle(self.x)
+
+        if unwrap_phase:
+            phase = numpy.unwrap(phase)
+
+        axs[1].plot(self.n, phase)
+        axs[1].set_xlabel(xlabel)
+        axs[1].set_ylabel(phase_label)
         axs[1].set_title(title_phase)
+        axs[1].grid(True)
 
         if auto_plot:
             plt.show()
 
         return fig, axs
 
+
+    def plot_as_frequency_response(
+        self,
+        title_mag: Optional[str] = r'Magnitude Frequency Response',
+        title_phase: Optional[str] = r'Phase Frequency Response',
+        auto_plot: Optional[bool] = True
+    ) -> Tuple[Figure, List[Axes]]:
+        return self.plot_frequency_domain(
+            title_mag=title_mag,
+            title_phase=title_phase,
+            auto_plot=auto_plot
+        )
+
+
+    def sinc_reconstruct(self, t: numpy.ndarray, Ts: float) -> "Signal":
+        """
+        Reconstructs analog signal using ideal sinc interpolation.
+
+        x_r(t) = sum_n x[n] sinc((t - nTs) / Ts)
+        """
+
+        tn = self.n
+
+        y = numpy.zeros_like(t, dtype=float)
+
+        for xk, tk in zip(self.x, tn):
+            y += xk * numpy.sinc((t - tk) / Ts)
+
+        return Signal(y, t)
+
+
+    def cubic_spline_reconstruct(self, t: numpy.ndarray) -> "Signal":
+        """
+        Reconstructs analog signal using cubic spline interpolation.
+        """
+
+        spline = CubicSpline(self.n, self.x)
+        y = spline(t)
+
+        return Signal(y, t)
+
+
+    def plot_continuous(
+        self,
+        title: Optional[str] = "Signal",
+        xlabel: Optional[str] = "t [s]",
+        ylabel: Optional[str] = "x(t)",
+        plot: Optional[Axes] = None,
+        auto_plot: bool = True,
+    ) -> Axes:
+
+        if plot is None:
+            plot = plt.subplot()
+
+        plot.plot(self.n, self.x)
+        plot.set_title(title)
+        plot.set_xlabel(xlabel)
+        plot.set_ylabel(ylabel)
+        plot.grid(True)
+
+        if auto_plot:
+            plt.show()
+
+        return plot
 
     # Overloads
 
@@ -545,6 +721,19 @@ class Signal:
             return Signal(self.x[key], self.n[key])
 
         return self.x[key]
+
+
+    def __pow__(self, other: int | float) -> 'Signal':
+        """
+        Overloads the ** operator.
+        Args:
+            signal: The Signal class to be raised to a power.
+
+        Returns:
+            signal: The raised Signal class.
+        """
+
+        return Signal(numpy.power(self.x, other), self.n)
 
 
     # Static methods

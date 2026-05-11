@@ -1,10 +1,6 @@
-[project.urls]
-Homepage = "https://github.com/JoaoMario109/ifsc-dsp-2024"
-Issues = "https://github.com/JoaoMario109/ifsc-dsp-2024/issues"
-
 [tool.poetry]
 name = "dsp-ifsc"
-version = "0.0.14"
+version = "0.0.16"
 description = "A small package with some utilities for DSP grade at IFSC - Campus Florianópolis"
 authors = [
     "João Mário Lago <joao.mcil2003@aluno.ifsc.edu.br>",
@@ -24,6 +20,7 @@ packages = [{include = "dsp_ifsc"}]
 python = ">=3.8"
 numpy = "*"
 matplotlib = "*"
+scipy = "*"
 
 [tool.poetry.urls]
 Homepage = "https://github.com/JoaoMario109/ifsc-dsp-2024"
